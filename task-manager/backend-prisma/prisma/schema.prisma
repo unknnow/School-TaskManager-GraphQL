@@ -1,0 +1,24 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://USERNAME:PASSWORD@localhost:5432/task-manager-graphql?schema=public"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
+  output   = "../prisma/generated/type-graphql"
+  emitIdAsIDType = true
+  simpleResolvers = true
+}
+
+model User {
+  id              String  @default(cuid()) @id
+  email           String  @unique
+  /// @TypeGraphQL.omit(output: true)
+  password        String
+  /// @TypeGraphQL.omit(output: true, input: true)
+  password_salt   String
+}
