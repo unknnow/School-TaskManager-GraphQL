@@ -20,5 +20,5 @@ model User {
   /// @TypeGraphQL.omit(output: true)
   password        String
   /// @TypeGraphQL.omit(output: true, input: true)
-  password_salt   String
+  password_digest   String
 }
