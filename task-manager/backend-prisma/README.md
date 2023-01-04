@@ -7,11 +7,11 @@ yarn
 
 ## Setup:
 
-1. Generate migrations of DB:
+1. Generate migrations of DB and apply changes on DB:
   ```sh
-  prisma migrate dev
+  yarn migrate
   ```
-2. Generate TypeScript code: 
+2. Generate TypeScript code:
   ```sh
   yarn generate
   ```
