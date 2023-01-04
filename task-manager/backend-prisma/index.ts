@@ -3,6 +3,7 @@ import * as TypeGraphQL from "type-graphql";
 import { ApolloServer } from "apollo-server";
 import { PrismaClient } from "@prisma/client";
 import { WebSocketServer } from 'ws';
+import cors from 'cors';
 
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { resolvers as generatedResolvers } from "./prisma/generated/type-graphql";
@@ -46,6 +47,10 @@ async function main() {
     schema,
     context: (): Context => ({ prisma }),
     introspection: true,
+    cors: {
+      origin: ['http://localhost:8000', 'https://studio.apollographql.com'],
+      credentials: true,
+    },
   });
   const wsServer = new WebSocketServer({
     server: server.httpServer,
