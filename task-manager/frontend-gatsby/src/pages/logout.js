@@ -1,12 +1,12 @@
 import React from 'react'
 import Layout from 'components/Layout/Layout'
-import Content from 'components/Tasks'
+import Content from 'components/LogOut'
 
-const Home = () => (
-  <Layout id="home" loginRequired={true}>
+const Page = () => (
+  <Layout id="logout" loginRequired={false}>
     <Content />
   </Layout>
 )
 
-export default Home
+export default Page
 export { Head } from 'components/Layout/Head'

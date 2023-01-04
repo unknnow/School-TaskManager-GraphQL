@@ -31,12 +31,11 @@ export const GET_CURRENT_USER = gql`
   ${USER_FRAGMENT}
 `
 
-export const LOGIN_USER = gql`
+export const LOGIN_USER_MUTATION = gql`
   mutation loginUser($email: String!, $password: String!) {
-    loginUser(input: { email: $email, password: $password }) {
-      user {
-        ...UserFragment
-      }
+    loginUser(where: { email: $email, password: $password }) {
+      id
+      name
     }
   }
   ${USER_FRAGMENT}
