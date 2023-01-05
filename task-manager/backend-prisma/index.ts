@@ -6,7 +6,7 @@ import { WebSocketServer } from 'ws';
 import cors from 'cors';
 
 import { useServer } from 'graphql-ws/lib/use/ws';
-import { resolvers as generatedResolvers } from "./prisma/generated/type-graphql";
+import { resolvers as generatedResolvers } from "@generated/index";
 
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 
