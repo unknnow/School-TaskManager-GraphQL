@@ -6,7 +6,9 @@ import { WebSocketServer } from 'ws';
 import cors from 'cors';
 
 import { useServer } from 'graphql-ws/lib/use/ws';
+
 import { resolvers as generatedResolvers } from "@generated/index";
+import { SubscriptionResolver } from './resolvers/SubscriptionResolver'
 
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 
@@ -14,20 +16,7 @@ interface Context {
   prisma: PrismaClient;
 }
 
-const pubSub = new RedisPubSub({
-  messageEventName: 'messageBuffer',
-  pmessageEventName: 'pmessageBuffer',
-});
-
-class SubscriptionResolver {
-  @TypeGraphQL.Subscription({
-    topics: ["NOTIFICATIONS", "ERRORS"],
-    subscribe: () => pubSub.asyncIterator('NOTIFICATIONS'),
-  })
-  hello(): String {
-    return 'hello';
-  };
-}
+const pubSub = new RedisPubSub();
 
 const resolvers = [
   ...generatedResolvers,
