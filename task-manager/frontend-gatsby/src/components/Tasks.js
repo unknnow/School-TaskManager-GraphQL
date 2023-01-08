@@ -9,15 +9,12 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 
-import { GET_ALL_TASKS_MADE_BY_ONE_USER, GET_ALL_TASKS_ASSIGNEE_TO_ONE_USER, DELETE_TASK_MUTATION, CREATE_COMMENT_MUTATION, UPDATE_TASK_STATE_MUTATION } from 'store/GraphqlQueries'
+import { GET_ALL_TASKS_MADE_BY_ONE_USER, DELETE_TASK_MUTATION, CREATE_COMMENT_MUTATION, UPDATE_TASK_STATE_MUTATION } from 'store/GraphqlQueries'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 
 import { navigate } from 'gatsby'
 
 import User from 'store/User'
-
-// clchjc2s60000uf44f8tzp2fo
-// clchkzb8f0000ufs8lzobr6ew
 
 function getStatusBadge(state) {
   switch(state) {

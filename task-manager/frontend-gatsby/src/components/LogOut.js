@@ -21,10 +21,10 @@ const LogOut = () => {
 
   return (
     <div className="col text-center">
-      <h1>Are your sure ?</h1>
-      <p className="text-muted">{"You'll be redirected to the home page"}</p>
+      <h1>Etes-vous sur de vouloir vous déconnecter ?</h1>
+      <p className="text-muted">{"Vous allez être redirigé vers la page d'accueil"}</p>
       <Button variant="danger" href="#logout" onClick={onClick}>
-        Sure I want to logout
+        Se déconnecter
       </Button>
     </div>
   )

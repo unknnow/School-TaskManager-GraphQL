@@ -39,6 +39,10 @@ export const GET_ALL_TASKS_MADE_BY_ONE_USER = gql`
       title
       description
       state
+      ownerId {
+        id
+        name
+      }
       Comment {
         id
         content
@@ -62,6 +66,10 @@ export const GET_ALL_TASKS_ASSIGNEE_TO_ONE_USER = gql`
       title
       description
       state
+      ownerId {
+        id
+        name
+      }
       Comment {
         id
         content
