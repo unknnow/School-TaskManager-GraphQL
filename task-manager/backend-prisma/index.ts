@@ -6,17 +6,25 @@ import { WebSocketServer } from 'ws';
 import cors from 'cors';
 
 import { useServer } from 'graphql-ws/lib/use/ws';
-// import { CreateOneTaskResolver, CreateOneAssigneeResolver, CreateOneCommentResolver, UpdateOneTaskResolver, CreateOneNotificationResolver, UpdateOneNotificationResolver, FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, DeleteOneTaskResolver, FindManyCommentResolver } from "@generated/index";
-import { resolvers as generatedResolvers } from "@generated/index";
+
+import {FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, FindManyCommentResolver} from "@generated/index"
+import {TaskRelationsResolver, CommentRelationsResolver, AssigneeRelationsResolver} from "@generated/index"
+import {CreateOneTaskResolver, CreateOneAssigneeResolver, CreateOneCommentResolver,  CreateOneNotificationResolver} from "@generated/index"
+import {UpdateOneTaskResolver, UpdateOneNotificationResolver} from "@generated/index"
+import {DeleteOneTaskResolver, DeleteManyAssigneeResolver, DeleteManyCommentResolver,} from "@generated/index"
+
+import {CreateOneUserResolver} from "./prisma/customResolvers/CreateOneUserResolver"
+import {LoginResolver} from "./prisma/customResolvers/LoginUserResolver"
 
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 
 import type { GraphQLResolveInfo } from "graphql";
-import { CreateOneUserArgs } from "./prisma/generated/type-graphql/resolvers/crud/User/args/CreateOneUserArgs";
-import { User } from "./prisma/generated/type-graphql/models/User";
-import { transformInfoIntoPrismaArgs, getPrismaFromContext, transformCountFieldIntoSelectRelationsCount } from "./prisma/generated/type-graphql/helpers";
+import { CreateOneNotificationArgs } from "@generated/resolvers/crud/Notification/args/CreateOneNotificationArgs";
 
-let bcrypt = require('bcryptjs');
+import { User } from "@generated/models/User";
+import { Notification } from "@generated/models/Notification";
+
+import { transformInfoIntoPrismaArgs, getPrismaFromContext, transformCountFieldIntoSelectRelationsCount } from "@generated/helpers";
 
 interface Context {
   prisma: PrismaClient;
@@ -37,64 +45,26 @@ class SubscriptionResolver {
   };
 }
 
-@TypeGraphQL.InputType("UserWhereUniqueInputLogin", {
-  isAbstract: true
-})
-export class UserWhereUniqueInputLogin {
-  @TypeGraphQL.Field(_type => String, {
-    nullable: true
-  })
-  id?: string | undefined;
 
-  @TypeGraphQL.Field(_type => String, {
+class NotificationSubscriptionResolver {
+  @TypeGraphQL.Subscription({
+    topics: ["NOTIFICATIONS"],
+    subscribe: () => pubSub.asyncIterator('NOTIFICATIONS'),
+  })
+  newNotif(@TypeGraphQL.Root() payload: any): String {
+    console.log("SUBSCRIPTION TRIGGER ! - NOTIFICATIONS")
+    console.log(`RECEIVED :  ${JSON.stringify(payload)}`)
+    return 'NewNotif';
+  };
+
+  @TypeGraphQL.Mutation(_returns => Notification, {
     nullable: false
   })
-  email?: string | undefined;
-
-  @TypeGraphQL.Field(_type => String, {
-    nullable: false
-  })
-  password?: string | undefined;
-}
-
-
-@TypeGraphQL.ArgsType()
-export class FindUniqueUserArgsLogin {
-  @TypeGraphQL.Field(_type => UserWhereUniqueInputLogin, {
-    nullable: false
-  })
-  where!: UserWhereUniqueInputLogin;
-}
-
-class LoginResolver {
-  @TypeGraphQL.Mutation(_returns => User, {
-    nullable: true
-  })
-  async loginUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: FindUniqueUserArgsLogin): Promise<User | null> {
+  async createOneNotificationAndAction(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: CreateOneNotificationArgs): Promise<Notification> {
     const { _count } = transformInfoIntoPrismaArgs(info);
+    await pubSub.publish("NOTIFICATIONS", args.data)
 
-    return getPrismaFromContext(ctx).user.findFirst({
-      ...args,
-      ...(_count && transformCountFieldIntoSelectRelationsCount(_count)),
-    });
-  }
-}
-
-class CreateOneUserResolver {
-  @TypeGraphQL.Mutation(_returns => User, {
-    nullable: false
-  })
-  async createOneUser(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: CreateOneUserArgs): Promise<User> {
-    const { _count } = transformInfoIntoPrismaArgs(info);
-
-    // ENCRYPT PASSWORD TO PASSWORD DIGEST
-    bcrypt.genSalt(10, function(err, salt) {
-      bcrypt.hash(args.data.password, salt, function(err, hash) {
-        args.data.passwordDigest =  hash;
-      });
-    });
-
-    return getPrismaFromContext(ctx).user.create({
+    return getPrismaFromContext(ctx).notification.create({
       ...args,
       ...(_count && transformCountFieldIntoSelectRelationsCount(_count)),
     });
@@ -102,11 +72,13 @@ class CreateOneUserResolver {
 }
 
 const resolvers = [
-  // CreateOneTaskResolver, CreateOneAssigneeResolver, CreateOneCommentResolver, UpdateOneTaskResolver, CreateOneNotificationResolver, UpdateOneNotificationResolver, CreateOneUserResolver,
-  // FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, FindManyCommentResolver,
-  // DeleteOneTaskResolver,
-  ...generatedResolvers, CreateOneUserResolver,
-  SubscriptionResolver, LoginResolver,
+  FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, FindManyCommentResolver,
+  CreateOneTaskResolver, CreateOneAssigneeResolver, CreateOneCommentResolver,  CreateOneNotificationResolver, CreateOneUserResolver,
+  UpdateOneTaskResolver, UpdateOneNotificationResolver,
+  TaskRelationsResolver, CommentRelationsResolver, AssigneeRelationsResolver,
+  DeleteOneTaskResolver, DeleteManyAssigneeResolver, DeleteManyCommentResolver,
+  LoginResolver,
+  NotificationSubscriptionResolver, SubscriptionResolver,
 ] as TypeGraphQL.NonEmptyArray<Function>;
 
 async function main() {
