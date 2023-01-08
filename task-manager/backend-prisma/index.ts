@@ -7,7 +7,7 @@ import cors from 'cors';
 
 import { useServer } from 'graphql-ws/lib/use/ws';
 
-import {FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, FindManyCommentResolver} from "@generated/index"
+import {FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, FindManyCommentResolver, FindManyNotificationResolver} from "@generated/index"
 import {TaskRelationsResolver, CommentRelationsResolver, AssigneeRelationsResolver} from "@generated/index"
 import {CreateOneTaskResolver, CreateOneAssigneeResolver, CreateOneCommentResolver,  CreateOneNotificationResolver} from "@generated/index"
 import {UpdateOneTaskResolver, UpdateOneNotificationResolver} from "@generated/index"
@@ -25,6 +25,8 @@ import { User } from "@generated/models/User";
 import { Notification } from "@generated/models/Notification";
 
 import { transformInfoIntoPrismaArgs, getPrismaFromContext, transformCountFieldIntoSelectRelationsCount } from "@generated/helpers";
+import { Root } from "type-graphql";
+import { isContext } from "vm";
 
 interface Context {
   prisma: PrismaClient;
@@ -38,7 +40,6 @@ const pubSub = new RedisPubSub({
 class SubscriptionResolver {
   @TypeGraphQL.Subscription({
     topics: ["NOTIFICATIONS", "ERRORS"],
-    subscribe: () => pubSub.asyncIterator('NOTIFICATIONS'),
   })
   hello(): String {
     return 'hello';
@@ -48,8 +49,7 @@ class SubscriptionResolver {
 
 class NotificationSubscriptionResolver {
   @TypeGraphQL.Subscription({
-    topics: ["NOTIFICATIONS"],
-    subscribe: () => pubSub.asyncIterator('NOTIFICATIONS'),
+    subscribe: () => pubSub.asyncIterator(['NOTIFICATIONS']),
   })
   newNotif(@TypeGraphQL.Root() payload: any): String {
     console.log("SUBSCRIPTION TRIGGER ! - NOTIFICATIONS")
@@ -62,7 +62,10 @@ class NotificationSubscriptionResolver {
   })
   async createOneNotificationAndAction(@TypeGraphQL.Ctx() ctx: any, @TypeGraphQL.Info() info: GraphQLResolveInfo, @TypeGraphQL.Args() args: CreateOneNotificationArgs): Promise<Notification> {
     const { _count } = transformInfoIntoPrismaArgs(info);
-    await pubSub.publish("NOTIFICATIONS", args.data)
+
+    console.log('CREATE NOTIFICATION ET ACTION')
+    await pubSub.publish("NOTIFICATIONS", {data: args.data})
+    console.log('PUSH SUSCRIBE')
 
     return getPrismaFromContext(ctx).notification.create({
       ...args,
@@ -72,7 +75,7 @@ class NotificationSubscriptionResolver {
 }
 
 const resolvers = [
-  FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, FindManyCommentResolver,
+  FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, FindManyCommentResolver, FindManyNotificationResolver,
   CreateOneTaskResolver, CreateOneAssigneeResolver, CreateOneCommentResolver,  CreateOneNotificationResolver, CreateOneUserResolver,
   UpdateOneTaskResolver, UpdateOneNotificationResolver,
   TaskRelationsResolver, CommentRelationsResolver, AssigneeRelationsResolver,

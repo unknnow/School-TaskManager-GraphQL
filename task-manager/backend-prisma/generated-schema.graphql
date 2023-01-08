@@ -37,6 +37,16 @@ enum ActionName {
   TASK_UPDATE
 }
 
+input ActionOrderByWithRelationInput {
+  Notification: NotificationOrderByRelationAggregateInput
+  createdAt: SortOrder
+  group: SortOrder
+  id: SortOrder
+  name: SortOrder
+  targetId: SortOrder
+  targetType: SortOrder
+}
+
 input ActionRelationFilter {
   is: ActionWhereInput
   isNot: ActionWhereInput
@@ -829,6 +839,22 @@ input NotificationOrderByRelationAggregateInput {
   _count: SortOrder
 }
 
+input NotificationOrderByWithRelationInput {
+  action: ActionOrderByWithRelationInput
+  actionId: SortOrder
+  id: SortOrder
+  readedAt: SortOrder
+  user: UserOrderByWithRelationInput
+  userId: SortOrder
+}
+
+enum NotificationScalarFieldEnum {
+  actionId
+  id
+  readedAt
+  userId
+}
+
 input NotificationScalarWhereInput {
   AND: [NotificationScalarWhereInput!]
   NOT: [NotificationScalarWhereInput!]
@@ -913,6 +939,7 @@ input NullableStringFieldUpdateOperationsInput {
 
 type Query {
   comments(cursor: CommentWhereUniqueInput, distinct: [CommentScalarFieldEnum!], orderBy: [CommentOrderByWithRelationInput!], skip: Int, take: Int, where: CommentWhereInput): [Comment!]!
+  notifications(cursor: NotificationWhereUniqueInput, distinct: [NotificationScalarFieldEnum!], orderBy: [NotificationOrderByWithRelationInput!], skip: Int, take: Int, where: NotificationWhereInput): [Notification!]!
   tasks(cursor: TaskWhereUniqueInput, distinct: [TaskScalarFieldEnum!], orderBy: [TaskOrderByWithRelationInput!], skip: Int, take: Int, where: TaskWhereInput): [Task!]!
   user(where: UserWhereUniqueInput!): User
   users(cursor: UserWhereUniqueInput, distinct: [UserScalarFieldEnum!], orderBy: [UserOrderByWithRelationInput!], skip: Int, take: Int, where: UserWhereInput): [User!]!
