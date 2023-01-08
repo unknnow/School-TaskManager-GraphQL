@@ -105,7 +105,7 @@ const resolvers = [
   // CreateOneTaskResolver, CreateOneAssigneeResolver, CreateOneCommentResolver, UpdateOneTaskResolver, CreateOneNotificationResolver, UpdateOneNotificationResolver, CreateOneUserResolver,
   // FindUniqueUserResolver, FindManyUserResolver, FindManyTaskResolver, FindManyCommentResolver,
   // DeleteOneTaskResolver,
-  ...generatedResolvers,
+  ...generatedResolvers, CreateOneUserResolver,
   SubscriptionResolver, LoginResolver,
 ] as TypeGraphQL.NonEmptyArray<Function>;
 
