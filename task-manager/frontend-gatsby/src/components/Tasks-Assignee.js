@@ -64,29 +64,12 @@ const Tasks = () => {
 
   var dataTasks = null
   if (User.get('current') != null) {
-    console.log('--------- ALL TASK USER - MADE ---------')
-    const {data, loading, error} = useQuery(GET_ALL_TASKS_MADE_BY_ONE_USER, {variables: {id: User.get('current').id}})
+    console.log('--------- ALL TASK USER - ASSIGNEE ---------')
+    const {data, loading, error} = useQuery(GET_ALL_TASKS_ASSIGNEE_TO_ONE_USER, {variables: {id: User.get('current').id}})
     console.log(data)
 
     if (data != null)
       dataTasks = data.tasks
-  }
-  
-  /*
-  console.log('--------- ALL TASK USER - ASSIGNEE ---------')
-  const {data2, loading2, error2} = useQuery(GET_ALL_TASKS_ASSIGNEE_TO_ONE_USER, {variables: {id: 'clchkzb8f0000ufs8lzobr6ew'}})
-  data != null ? setListAssigneeUser(data2.tasks) : setListAssigneeUser(null)
-  console.log(listAssigneeUser)
-  */
-
-  const onDeleteButtonClick = (e) => {
-    deleteTask({ variables: {id: e.target.dataset.taskId} })
-      .then((payload) => {
-        navigate('/')
-      })
-      .catch((error) => {
-        alert(error)
-      })
   }
 
   var listTasksCards = <p>Aucune tâche disponible ...</p>;
@@ -156,17 +139,12 @@ const Tasks = () => {
 
             <Card.Footer>
               <Button variant="success" size="sm" onClick={onChangeStatusButtonClick}>Changer de status</Button>
-              <Button variant="danger" size="sm" className='ms-2' data-task-id={task.id} onClick={onDeleteButtonClick}>Supprimer</Button>
             </Card.Footer>
           </Card>
         </Col>
         
         /*
-        <td>
-          <Badge bg="warning">PENDING</Badge>
-        </td>
         <td>{new Date('2022-12-25').toLocaleString()}</td>
-        <td>Efficom</td>
         */
       )
     })
@@ -222,7 +200,7 @@ const Tasks = () => {
 
   return (
     <div className="col">
-      <h3>Mes tâches créées</h3>
+      <h3>Mes tâches assignée</h3>
 
       <Row xs={1} md={2} className="g-4">
         {listTasksCards}

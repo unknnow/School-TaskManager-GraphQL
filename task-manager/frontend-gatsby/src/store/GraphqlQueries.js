@@ -46,6 +46,11 @@ export const GET_ALL_TASKS_MADE_BY_ONE_USER = gql`
           name
         }
       }
+      Assignee {
+        user {
+          name
+        }
+      }
     }
   }
 `
@@ -61,6 +66,11 @@ export const GET_ALL_TASKS_ASSIGNEE_TO_ONE_USER = gql`
         id
         content
         ownerId {
+          name
+        }
+      }
+      Assignee {
+        user {
           name
         }
       }

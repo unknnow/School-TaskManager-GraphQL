@@ -25,10 +25,12 @@ const AppNavbar = () => {
         </Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
-          <Button variant="primary" size="sm" className="me-4" onClick={onAddTaskButtonClick}>Ajouter une tâche</Button>
+          { currentUser &&
+            <Button variant="primary" size="sm" className="me-4" onClick={onAddTaskButtonClick}>Ajouter une tâche</Button>
+          }
           {currentUser && (
             <Navbar.Text>
-              {'Signed in as: '}
+              {'Connecté en tant que : '}
               <strong>
                 <a title="LogOut" href="/logout/">
                   {currentUser.name}
@@ -39,11 +41,11 @@ const AppNavbar = () => {
           {!currentUser && (
             <>
               <Navbar.Text>
-                <a href="/sign-in/">SignIn</a>
+                <a href="/sign-in/">Se connecter</a>
               </Navbar.Text>
               <Navbar.Text className="mx-2">{'|'}</Navbar.Text>
               <Navbar.Text>
-                <a href="/sign-up/">SignUp</a>
+                <a href="/sign-up/">Créer un compte</a>
               </Navbar.Text>
             </>
           )}
