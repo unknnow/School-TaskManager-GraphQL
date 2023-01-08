@@ -1,0 +1,154 @@
+// MUTATION - CREATION DE TACHES
+mutation createOneTask($data: TaskCreateInput!) {
+  createOneTask(data: $data) {
+    id
+    title
+    description
+    state
+    createdAt
+  }
+}
+
+{
+  "data": {
+    "title": "TITRE",
+    "ownerId": {
+      "connect": {
+        "id": "clchjc2s60000uf44f8tzp2fo"
+      }
+    },
+    "state": "PENDING",
+    "description": "DESC"
+  }
+}
+//
+
+
+// MUTATION - ASSIGNER UNE TACHE A UN UTILISATEUR
+mutation CreateOneAssignee($data: AssigneeCreateInput!) {
+  createOneAssignee(data: $data) {
+    id
+    taskId
+    userId
+    createdAt
+  }
+}
+
+{
+  "data": {
+    "task": {
+      "connect": {
+        "id": "clci46pab0000uf58nu45p6j8"
+      }
+    },
+    "user": {
+      "connect": {
+        "id": "clchkzb8f0000ufs8lzobr6ew"
+      }
+    }
+  }
+}
+//
+
+
+// MUTATION - AJOUTER UN COMMENTAIRE A UNE TACHE
+mutation CreateOneComment($data: CommentCreateInput!) {
+  createOneComment(data: $data) {
+    id
+    userId
+    taskId
+    targetType
+  }
+}
+
+{
+  "data": {
+    "content": "CONTENT",
+    "ownerId": {
+      "connect": {
+        "id": "clchkzb8f0000ufs8lzobr6ew"
+      }
+    },
+    "parentId": null,
+    "targetId": {
+      "connect": {
+        "id": "clci46pab0000uf58nu45p6j8"
+      }
+    },
+    "targetType": "CREATE"
+  }
+}
+//
+
+
+// MUTATION - CHANGER L'ETAT D'UNE TACHE
+mutation UpdateOneTask($data: TaskUpdateInput!, $where: TaskWhereUniqueInput!) {
+  updateOneTask(data: $data, where: $where) {
+    id
+    title
+    description
+    state
+  }
+}
+
+{
+  "data": {
+    "state": {
+      "set": "ACTIVE"
+    }
+  },
+  "where": {
+    "id": "clci46pab0000uf58nu45p6j8"
+  }
+}
+//
+
+
+// MUTATION - AJOUTE UNE NOTIFICATION
+mutation CreateOneNotification($data: NotificationCreateInput!) {
+  createOneNotification(data: $data) {
+    id
+    userId
+    actionId
+  }
+}
+
+{
+  "data": {
+    "user": {
+      "connect": {
+        "id": "clchjc2s60000uf44f8tzp2fo"
+      }
+    },
+    "action": {
+      "create": {
+        "name": "TASK_UPDATE",
+        "group": "TASK",
+        "targetId": "clci46pab0000uf58nu45p6j8",
+        "targetType": "UPDATE"
+      }
+    }
+  }
+}
+//
+
+
+// MUTATION - MARQUER UNE NOTIFICATION EN LUE/VUE
+mutation UpdateOneNotification($data: NotificationUpdateInput!, $where: NotificationWhereUniqueInput!) {
+  updateOneNotification(data: $data, where: $where) {
+    id
+    readedAt
+  }
+}
+
+{
+  "data": {
+    "readedAt": {
+      "set": "2023-01-04 10:25"
+    }
+  },
+  "where": {
+    "id": "clci5vlcy0001ufwchhrbwlhv"
+  }
+}
+//

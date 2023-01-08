@@ -1,17 +1,23 @@
 import React from 'react'
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation, useQuery } from '@apollo/react-hooks'
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 
 import User from 'store/User'
-import { LOGIN_USER_MUTATION } from 'store/GraphqlQueries'
+import { LOGIN_USER_MUTATION, GET_CURRENT_USER } from 'store/GraphqlQueries'
 import { navigate } from 'gatsby'
 
 const SignIn = () => {
   const [email, setEmail] = React.useState(User.get('new', 'email'))
   const [password, setPassword] = React.useState()
   const [signIn] = useMutation(LOGIN_USER_MUTATION)
+
+  /*
+  console.log('--------- CURRENT USER ---------');
+  var {data, loading, error} = useQuery(GET_CURRENT_USER, {variables: {id: 'clcixdeg30000uf64xlkbyzmg'}})
+  console.log(data);
+  */
 
   const onInputChange = (e) => {
     const value = e.target.value
@@ -35,14 +41,17 @@ const SignIn = () => {
 
     signIn({ variables: { email: email, password: password } })
       .then((payload) => {
-        User.set('current', payload)
-        navigate('/')
+        console.log(payload)
+        if (payload.data.loginUser != null) {
+          User.set('current', payload.data.loginUser)
+          navigate('/')
+        } else {
+          alert("Utilisateur introuvable !")
+        }
       })
       .catch((error) => {
         alert(error)
       })
-
-    return false
   }
 
   return (
@@ -51,7 +60,7 @@ const SignIn = () => {
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
           <Form.Control
-            type="email"
+            type="text"
             placeholder="Enter email"
             onChange={onInputChange}
             name="email"
@@ -73,7 +82,7 @@ const SignIn = () => {
           />
         </Form.Group>
         <Button variant="primary" type="submit">
-          Submit
+          Connexion
         </Button>
       </Form>
     </div>

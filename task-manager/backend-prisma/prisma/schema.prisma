@@ -1,6 +1,6 @@
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://USERNAME:PASSWORD@localhost:5432/task-manager-graphql?schema=public"
+  url      = "postgresql://$(whoami)@localhost:5432/task-manager-graphql?schema=public"
 }
 
 generator client {
@@ -8,17 +8,113 @@ generator client {
 }
 
 generator typegraphql {
-  provider = "typegraphql-prisma"
-  output   = "../prisma/generated/type-graphql"
-  emitIdAsIDType = true
+  provider        = "typegraphql-prisma"
+  output          = "../prisma/generated/type-graphql"
+  emitIdAsIDType  = true
   simpleResolvers = true
 }
 
+model Action {
+  id           String           @id @unique @default(cuid())
+  group        ActionGroup
+  name         ActionName
+  createdAt    DateTime         @default(now())
+  targetId     String
+  targetType   ActionTargetType
+  Notification Notification[]
+}
+
 model User {
-  id              String  @default(cuid()) @id
-  email           String  @unique
-  /// @TypeGraphQL.omit(output: true)
-  password        String
-  /// @TypeGraphQL.omit(output: true, input: true)
-  password_digest   String
+  id             String         @id @unique @default(cuid())
+  name           String
+  password       String
+  passwordDigest String
+  active         Boolean        @default(true)
+  preferences    Json?
+  email          String         @unique
+  lastSignInAt   DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime?      @updatedAt
+  Notification   Notification[]
+  Task           Task[]
+  Comment        Comment[]
+  Assignee       Assignee[]
+}
+
+model Notification {
+  id       String    @id @unique @default(cuid())
+  user     User      @relation(fields: [userId], references: [id])
+  userId   String
+  action   Action    @relation(fields: [actionId], references: [id])
+  actionId String
+  readedAt DateTime?
+}
+
+model Task {
+  id          String     @id @unique @default(cuid())
+  title       String
+  description String?
+  ownerId     User       @relation(fields: [userId], references: [id])
+  dueAt       DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime?  @updatedAt
+  state       TaskState
+  userId      String
+  Comment     Comment[]
+  Assignee    Assignee[]
+}
+
+model Comment {
+  id         String            @id @unique @default(cuid())
+  ownerId    User              @relation(fields: [userId], references: [id])
+  targetId   Task              @relation(fields: [taskId], references: [id])
+  targetType CommentTargetType
+  parentId   String?
+  content    String
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime?         @updatedAt
+  userId     String
+  taskId     String
+}
+
+model Assignee {
+  id        String   @id @unique @default(cuid())
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+enum ActionGroup {
+  COMMENT
+  TASK
+}
+
+enum ActionName {
+  COMMENT_CREATE
+  COMMENT_DELETE
+  COMMENT_UPDATE
+  TASK_CREATE
+  TASK_DELETE
+  TASK_UPDATE
+}
+
+enum ActionTargetType {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum TaskState {
+  ACTIVE
+  PENDING
+  CANCEL
+  FINISH
+}
+
+enum CommentTargetType {
+  CREATE
+  UPDATE
+  DELETE
 }
